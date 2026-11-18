@@ -1,4 +1,5 @@
 <!doctype html>
+<!-- index.html v3.3 | 18 Nov 2026 | Three-step order form; Stripe SANDBOX payment link wired in. Pairs with api/p333.js v3.2. -->
 <html lang="en-GB">
 <head>
 <meta charset="utf-8">
@@ -99,6 +100,22 @@ nav a.l:hover{color:var(--ink)}
 .orderbox label{font-weight:600;font-size:14px;display:block;margin-bottom:6px}
 .orderbox textarea,.orderbox input{width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:15px Inter,sans-serif;margin-bottom:14px}
 .orderbox textarea{min-height:110px;resize:vertical}
+.orderbox .pair{display:grid;grid-template-columns:1fr 140px;gap:0 12px}@media(max-width:560px){.orderbox .pair{grid-template-columns:1fr}}
+.orderbox .reach{display:grid;gap:8px;margin:0 0 14px}.orderbox .opt{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:10px;padding:10px 12px;cursor:pointer;background:var(--bg)}.orderbox .opt input{margin-top:4px;width:auto}.orderbox .opt small{display:block;color:var(--mute);font-size:13px}.orderbox .opt:has(input:checked){border-color:var(--accent)}
+.formbox{margin-top:18px;max-width:560px}
+.fsteps{display:flex;gap:6px;margin:0 0 10px}
+.fsteps i{height:4px;flex:1;border-radius:99px;background:var(--line)}
+.fsteps i.on{background:var(--accent)}
+.fstep-label{font-size:12px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;color:var(--mute);margin:0 0 14px}
+.fs input:not([type=radio]):not([type=hidden]),.fs textarea{display:block}
+.fs .row{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;margin-top:2px}
+.fs .row small{color:var(--mute);font-size:13px;flex:1;min-width:170px}
+.ferr{color:var(--warn);font-size:13px;font-weight:600;margin:-8px 0 12px}
+.orderbox input[aria-invalid=true],.orderbox textarea[aria-invalid=true]{border-color:var(--warn)}
+.brief{background:var(--bg);border:1px dashed var(--line);border-radius:10px;padding:12px 14px;font-size:14px;margin:0 0 14px;white-space:pre-wrap;color:var(--mute)}
+.brief b{display:block;color:var(--ink);font-size:13px;letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;white-space:normal}
+.opt:focus-within{border-color:var(--accent)}
+.hide{display:none!important}
 .helper{border:1px solid var(--line);background:var(--soft);border-radius:12px;padding:16px;margin:0 0 16px}
 .helper h4{margin:0 0 4px;font-size:15px}
 .helper .hq{margin:12px 0 0}
@@ -135,9 +152,53 @@ footer a{text-decoration:none;margin-right:16px}footer a:hover{color:var(--ink)}
     <div class="eyebrow">The who. The how. The why.</div>
     <h1>Your route to what's next.</h1>
     <p class="lead">Tell us what you're trying to achieve. We find the doors that are open, check each one, and tell you who to approach, how, and why, with the evidence and a message ready to send.</p>
-    <div class="goalbox">
-      <textarea id="heroGoal" placeholder="e.g. We run a small volunteer playgroup in a village hall and want more families and some funding for the hall rent…"></textarea>
-      <div class="row"><small>One plain sentence is enough.</small><a class="btn btn-primary" href="#order" id="heroGo">Get my report</a></div>
+    <div class="orderbox formbox" id="order">
+      <div class="fsteps" aria-hidden="true"><i class="on" id="d1"></i><i id="d2"></i><i id="d3"></i></div>
+      <p class="fstep-label" id="stepLabel" role="status">Step 1 of 3 &middot; Your goal</p>
+
+      <div class="fs" id="st1">
+        <label for="goal">What do you want to happen?</label>
+        <textarea id="goal" maxlength="1500" placeholder="e.g. More families coming to our playgroup, and some funding towards the hall rent."></textarea>
+        <p class="ferr hide" id="e_goal" role="alert"></p>
+        <div class="row"><small>A sentence or two is plenty. Next we ask who you are and where, so we search the right places.</small>
+          <button class="btn btn-primary" id="n1" type="button">Continue</button></div>
+      </div>
+
+      <div class="helper" id="helper" hidden aria-live="polite"></div>
+
+      <div class="fs hide" id="st2">
+        <label for="who">What do you do, and how big are you?</label>
+        <input id="who" type="text" maxlength="200" placeholder="e.g. Volunteer-run playgroup for under-5s, about 18 children, not a charity" autocomplete="organization-title">
+        <p class="ferr hide" id="e_who" role="alert"></p>
+        <div class="pair">
+          <div><label for="place">Your town or county</label>
+            <input id="place" type="text" maxlength="80" placeholder="e.g. Oakham, Rutland" autocomplete="address-level2">
+            <p class="ferr hide" id="e_place" role="alert"></p></div>
+          <div><label for="pc">Postcode area</label>
+            <input id="pc" type="text" maxlength="4" placeholder="LE15" autocomplete="postal-code" inputmode="text" style="text-transform:uppercase">
+            <p class="ferr hide" id="e_pc" role="alert"></p></div>
+        </div>
+        <label id="reachLbl">How far should we look?</label>
+        <div class="reach" role="radiogroup" aria-labelledby="reachLbl">
+          <label class="opt"><input type="radio" name="reach" value="local" checked> <span><b>Near me</b><small>Your area and county: local funders, councils, listings, groups and buyers</small></span></label>
+          <label class="opt"><input type="radio" name="reach" value="uk"> <span><b>Anywhere in the UK</b><small>National schemes and organisations as well as local ones</small></span></label>
+        </div>
+        <div class="row"><button class="btn btn-ghost" id="b2" type="button">Back</button>
+          <button class="btn btn-primary" id="n2" type="button">Continue</button></div>
+      </div>
+
+      <div class="fs hide" id="st3">
+        <label for="tried">Anything already tried, or to leave out? <span class="note" style="display:inline;font-weight:400">(optional)</span></label>
+        <input id="tried" type="text" maxlength="200" placeholder="e.g. Already on the council's directory; no social media ads">
+        <label for="email">Where shall we send the report?</label>
+        <input id="email" type="email" maxlength="200" placeholder="you@example.com" autocomplete="email">
+        <p class="ferr hide" id="e_email" role="alert"></p>
+        <div class="brief" id="brief"></div>
+        <input type="hidden" id="offer" value="single">
+        <div class="row"><button class="btn btn-ghost" id="b3" type="button">Back</button>
+          <button class="btn btn-primary" id="orderGo" type="button">Pay &pound;24.95 and start</button></div>
+        <p class="tiny" style="margin-top:10px">Payment is handled by Stripe. We never see your card details. Your research starts as soon as the payment clears.</p>
+      </div>
     </div>
     <div class="trust"><span>Every route read on its own page</span><span>Closed doors flagged</span><span>Ready-to-send first message</span></div>
   </div>
@@ -196,11 +257,11 @@ footer a{text-decoration:none;margin-right:16px}footer a:hover{color:var(--ink)}
   <p class="lead">The same clear layout whatever your subject. Facts are kept apart from judgement, so you can see what the source says and what we think.</p>
   <div class="grid8">
     <div class="card"><span class="n">01</span><h3>Your objective</h3><p>Your goal, restated, so you can see we understood it.</p></div>
-    <div class="card"><span class="n">02</span><h3>Key findings</h3><p>The strongest starting points up front.</p></div>
+    <div class="card"><span class="n">02</span><h3>Options at a glance</h3><p>Every route found in one table, with five checks each: serves you, a way to apply, cost, open now, contact.</p></div>
     <div class="card"><span class="n">03</span><h3>Route cards</h3><p>What the source says, why it matters, what to confirm.</p></div>
     <div class="card"><span class="n">04</span><h3>First messages</h3><p>A drafted email with a clear question, one click to copy.</p></div>
     <div class="card"><span class="n">05</span><h3>Coverage chart</h3><p>Which parts of your goal have routes, and which don't.</p></div>
-    <div class="card"><span class="n">06</span><h3>Set aside</h3><p>Closed or unsuitable routes, and why we dropped them.</p></div>
+    <div class="card"><span class="n">06</span><h3>Alternatives</h3><p>What else we found and set aside, with the reason, so you can judge it yourself.</p></div>
     <div class="card"><span class="n">07</span><h3>Worth checking</h3><p>Pages we couldn't read and clearly labelled pointers.</p></div>
     <div class="card"><span class="n">08</span><h3>Sources &amp; limits</h3><p>Every link, the date checked, and what we can't tell you.</p></div>
   </div>
@@ -217,23 +278,14 @@ footer a{text-decoration:none;margin-right:16px}footer a:hover{color:var(--ink)}
   <p class="lead">No subscription and no account. Pick an option, tell us your goal, and the report arrives by email. Reports are currently prepared by hand-checked runs, so delivery is within 24 hours.</p>
   <div class="prices">
     <a class="price pop" data-offer="single" href="#order"><span class="badge">One-off payment</span><span class="name">Standard report</span><span class="amt">£24.95</span><span class="per">one goal, one report. The number of routes depends on the research; no fixed number is promised.</span>
-      <ul><li>Ranked, researched opportunities</li><li>Evidence and source links</li><li>Verified route, or a clear note that you need to ask first</li><li>Costs, eligibility and barriers where the evidence supports them</li><li>Practical first messages and next steps</li></ul><span class="go">Choose this →</span></a>
+      <ul><li>Every route found, compared in one table</li><li>Five on-page checks per route, with the page's own words</li><li>The one to start with, and why</li><li>Evidence and source links</li><li>Verified route, or a clear note that you need to ask first</li><li>Costs, eligibility and barriers where the evidence supports them</li><li>Practical first messages and next steps</li></ul><span class="go">Choose this →</span></a>
   </div>
   <p class="note" style="margin-top:18px">A verified route means the page confirms a way to apply or enquire. It does not guarantee the organisation will accept you. If a report finds fewer than two routes with a working contact or apply path, we say so plainly and refund you in full.</p>
 
-  <div class="orderbox" id="order">
-    <h3 style="margin-bottom:6px">Get your report</h3>
-    <p class="note" style="margin:0 0 16px">Write your goal, choose an option above, then press the button. If your goal is short, a quick AI helper may ask up to three questions so the report finds the right doors. You'll then be taken to checkout, or an email will open if checkout isn't live yet.</p>
-    <label for="goal">Your goal</label>
-    <textarea id="goal" placeholder="What are you trying to achieve? Where? Any limits (budget, timing, who you are)?"></textarea>
-    <label for="email">Your email (the report is sent here)</label>
-    <input id="email" type="email" placeholder="you@example.com" autocomplete="email">
-    <label for="offer">Option</label>
-    <select id="offer" style="width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:15px Inter,sans-serif;margin-bottom:16px">
-      <option value="single">Standard report – £24.95</option>
-    </select>
-    <div class="helper" id="helper" hidden aria-live="polite"></div>
-    <a class="btn btn-primary" id="orderGo" href="#">Continue</a>
+  <div class="orderbox" style="text-align:center">
+    <h3 style="margin:0 0 6px">Ready when you are</h3>
+    <p class="note" style="margin:0 0 16px">Three short steps: your goal, who and where you are, and how far to look. It takes about a minute, and you see exactly what we will research before you pay.</p>
+    <a class="btn btn-primary" href="#order">Start my report</a>
   </div>
 </div></section>
 
@@ -265,28 +317,43 @@ footer a{text-decoration:none;margin-right:16px}footer a:hover{color:var(--ink)}
 <script>
 /* ---- EDIT HERE: checkout links, contact email, offers ---- */
 const CONTACT_EMAIL = "pay1709@sky.com";
+const P333_API    = "https://rcloop-proxy.vercel.app/api/p333";       // stores the goal before checkout, so closing the tab after paying loses nothing
 const CLARIFY_URL = "https://rcloop-proxy.vercel.app/api/clarify";   // goal helper. Set to "" to switch it off; the page works without it.
 const OFFERS = {
-  single:  {label:"Standard report", price:"£24.95", url:""}   // checkout is wired at Stage 8. Empty = order by email instead.
+  // Stripe Payment Link. This is the SANDBOX link (note the test_): test cards only, no real money.
+  // To go live: create the product, price and link again in LIVE mode, then swap this one line.
+  single:  {label:"Standard report", price:"£24.95", url:"https://buy.stripe.com/test_eVq9AUeUU5iQb7RaGnbfO00"}
 };
 /* ---------------------------------------------------------- */
 const $ = id => document.getElementById(id);
 $("contactLink").href = "mailto:" + CONTACT_EMAIL;
 document.querySelectorAll("[data-todo]").forEach(a => a.addEventListener("click", e => e.preventDefault()));
-$("heroGo").addEventListener("click", () => { $("goal").value = $("heroGoal").value; });
-document.querySelectorAll("a.price").forEach(a => a.addEventListener("click", () => { $("offer").value = a.dataset.offer; }));
 /* ---- order flow: optional AI goal helper, then the existing checkout / email step ---- */
 const HELPER_MIN_WORDS = 25;           // goals at least this long skip the helper (nothing to ask, no cost)
 let checkedGoal = "";                  // the goal text the helper has already looked at
 const wordCount = t => (t.match(/\S+/g) || []).length;
 
-function finish(goal) {
+// Write the goal to our server BEFORE sending anyone to Stripe, and carry only an opaque reference through checkout.
+// Stripe hands that reference back on the webhook, so the order and the research survive the browser being closed.
+async function saveGoal(goal) {
+  try {
+    const r = await fetch(P333_API + "?op=intend", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ goal: goal }) });
+    if (!r.ok) return "";
+    const j = await r.json();
+    return /^[a-f0-9]{32}$/.test(j.ref || "") ? j.ref : "";
+  } catch (_) { return ""; }      // if it does not save, the order page still asks for the goal: never block a sale over it
+}
+
+async function finish(goal) {
   const o = OFFERS[$("offer").value], email = $("email").value.trim();
   window.P333_LAST = { offer: $("offer").value, goal: goal, email: email };   // read by tests only
   try { localStorage.setItem("p333_goal", goal); } catch (_) {}
   if (o.url) {
+    GO.setAttribute("disabled", ""); GO.textContent = "Taking you to checkout\u2026";
+    const ref = await saveGoal(goal);
     const u = new URL(o.url);
-    if (email) u.searchParams.set("checkout[email]", email);   // Lemon Squeezy checkout parameter
+    if (email) u.searchParams.set("prefilled_email", email);   // Stripe payment link parameter
+    if (ref) u.searchParams.set("client_reference_id", ref);   // opaque: it names a stored goal, it grants nothing
     window.location.href = u.toString();
   } else {
     const body = "Offer: " + o.label + " (" + o.price + ")\nMy email: " + email + "\n\nMy goal:\n" + goal;
@@ -304,15 +371,90 @@ async function ask(payload) {            // returns the reply, or null on any pr
   } catch (_) { return null; } finally { clearTimeout(t); }
 }
 
+/* ---- the form: three short steps, so nobody meets a wall of boxes at the moment of paying ---- */
+const DRAFT = "p333_draft";
+const FIELDS = ["goal", "who", "place", "pc", "tried", "email"];
+let step = 1;
+
+function saveDraft() {
+  const d = {}; FIELDS.forEach(f => d[f] = $(f).value);
+  d.reach = (document.querySelector("input[name=reach]:checked") || {}).value || "local";
+  try { localStorage.setItem(DRAFT, JSON.stringify(d)); } catch (_) {}
+}
+function loadDraft() {
+  let d = null; try { d = JSON.parse(localStorage.getItem(DRAFT) || "null"); } catch (_) {}
+  if (!d) return;
+  FIELDS.forEach(f => { if (typeof d[f] === "string") $(f).value = d[f]; });
+  const r = document.querySelector('input[name=reach][value="' + (d.reach || "local") + '"]');
+  if (r) r.checked = true;
+}
+function clearDraft() { try { localStorage.removeItem(DRAFT); } catch (_) {} }
+
+const LABELS = { 1: "Your goal", 2: "You and your area", 3: "Where to send it" };
+function goTo(n, quiet) {
+  step = n;
+  [1, 2, 3].forEach(i => { $("st" + i).classList.toggle("hide", i !== n); $("d" + i).classList.toggle("on", i <= n); });
+  $("stepLabel").textContent = "Step " + n + " of 3 \u00b7 " + LABELS[n];
+  if (n === 3) { $("brief").innerHTML = "<b>What we will research</b>"; $("brief").append(document.createTextNode(orderText())); }
+  const first = $("st" + n).querySelector("textarea,input:not([type=hidden]):not([type=radio])");
+  if (quiet) { return; }                       // the first draw on page load must not move the page
+  if (first) { first.focus({ preventScroll: true }); }
+  $("order").scrollIntoView({ behavior: "smooth", block: "nearest" });
+}
+
+function err(id, msg) {
+  const e = $("e_" + id);
+  if (!msg) { e.classList.add("hide"); e.textContent = ""; $(id).removeAttribute("aria-invalid"); return true; }
+  e.textContent = msg; e.classList.remove("hide"); $(id).setAttribute("aria-invalid", "true");
+  return false;
+}
+const wordsIn = t => (String(t).match(/\S+/g) || []).length;
+
+function checkStep1() {
+  const g = $("goal").value.trim();
+  if (!g) return err("goal", "Please tell us what you want to happen.");
+  if (wordsIn(g) < 5) return err("goal", "A few more words, please: what do you want to happen, and for whom?");
+  return err("goal", "");
+}
+function checkStep2() {
+  let ok = true;
+  ok = err("who", $("who").value.trim() ? "" : "Please say what you do. It decides which kinds of route we look for.") && ok;
+  ok = err("place", $("place").value.trim() ? "" : "Please give your town or county.") && ok;
+  const pc = $("pc").value.trim().toUpperCase().replace(/[^A-Z0-9]/g, "");
+  if (!pc) { ok = err("pc", "Needed, to find what is near you.") && ok; }
+  else if (!/^[A-Z]{1,2}[0-9][A-Z0-9]?$/.test(pc)) { ok = err("pc", "Just the first part, e.g. LE15 or M1.") && ok; }
+  else { $("pc").value = pc; err("pc", ""); }
+  return ok;
+}
+function checkStep3() {
+  const e = $("email").value.trim();
+  if (!e) return err("email", "We need an email address to send the report to.");
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e)) return err("email", "That email address does not look right.");
+  return err("email", "");
+}
+
+FIELDS.forEach(f => $(f).addEventListener("input", () => { saveDraft(); if ($("e_" + f)) { err(f, ""); } }));
+document.querySelectorAll("input[name=reach]").forEach(r => r.addEventListener("change", saveDraft));
+
+// Enter moves on from a single-line box; a textarea keeps Enter for new lines and takes Ctrl or Cmd with Enter instead.
+$("order").addEventListener("keydown", e => {
+  if (e.key !== "Enter") return;
+  const t = e.target, isArea = t.tagName === "TEXTAREA";
+  if (isArea && !(e.ctrlKey || e.metaKey)) return;
+  if (t.tagName !== "INPUT" && !isArea) return;
+  e.preventDefault();
+  ({ 1: "n1", 2: "n2", 3: "orderGo" })[step] && $(({ 1: "n1", 2: "n2", 3: "orderGo" })[step]).click();
+});
+
 const H = $("helper"), GO = $("orderGo");
 function el(tag, text, cls) { const n = document.createElement(tag); if (text) n.textContent = text; if (cls) n.className = cls; return n; }
-function openHelper() { H.hidden = false; GO.style.display = "none"; }
-function closeHelper() { H.hidden = true; H.replaceChildren(); GO.style.display = ""; GO.removeAttribute("disabled"); GO.textContent = "Continue"; }
+function openHelper() { H.hidden = false; $("st1").classList.add("hide"); }
+function closeHelper() { H.hidden = true; H.replaceChildren(); $("n1").removeAttribute("disabled"); $("n1").textContent = "Continue"; }
 
 function showQuestions(goal, qs) {
   H.replaceChildren();
   H.appendChild(el("h4", "A few quick questions"));
-  H.appendChild(el("p", "Your goal is short, so these help us search the right places. Answer what you can; skip anything you're unsure about.", "note"));
+  H.appendChild(el("p", "Your goal is short, so these help us search the right places. Answer what you can, or skip them.", "note"));
   const inputs = qs.map(q => {
     const d = el("div", "", "hq"), l = el("label", q.q), i = document.createElement("input");
     i.type = "text"; i.maxLength = 300; i.id = "hq_" + q.id; l.htmlFor = i.id;
@@ -324,7 +466,7 @@ function showQuestions(goal, qs) {
   build.type = skip.type = "button";
   acts.append(build, skip); H.appendChild(acts);
   H.appendChild(el("p", "An AI assistant reads what you have written here to ask these questions. Skip it if you prefer.", "tiny"));
-  skip.onclick = () => { closeHelper(); finish(goal); };
+  skip.onclick = () => { closeHelper(); goTo(2); };
   build.onclick = async () => {
     build.disabled = true; build.textContent = "Writing your brief…";
     const answers = inputs.map(x => ({ q: x.q, a: x.i.value.trim() })).filter(x => x.a);
@@ -348,25 +490,46 @@ function showBrief(goal, brief) {
   const acts = el("div", "", "acts");
   const ok = el("button", "Use this brief", "btn btn-primary"), back = el("button", "Back to my goal", "btn btn-ghost");
   ok.type = back.type = "button"; acts.append(ok, back); H.appendChild(acts);
-  ok.onclick = () => { const g = ta.value.trim() || goal; $("goal").value = g; checkedGoal = g; closeHelper(); finish(g); };
-  back.onclick = () => { closeHelper(); $("goal").focus(); };
+  ok.onclick = () => { const g = ta.value.trim() || goal; $("goal").value = g; checkedGoal = g; saveDraft(); closeHelper(); goTo(2); };
+  back.onclick = () => { closeHelper(); goTo(1); };
   ta.focus();
 }
 
-GO.addEventListener("click", async e => {
-  e.preventDefault();
-  const goal = $("goal").value.trim();
-  if (!goal) { $("goal").focus(); return; }
-  if (!CLARIFY_URL || wordCount(goal) >= HELPER_MIN_WORDS || goal === checkedGoal) { finish(goal); return; }
-  GO.setAttribute("disabled", ""); GO.textContent = "Checking your goal…";
-  const r = await ask({ goal: goal });
-  checkedGoal = goal;
-  if (r && r.enough === false && Array.isArray(r.questions) && r.questions.length) {
-    GO.removeAttribute("disabled"); GO.textContent = "Continue"; openHelper(); showQuestions(goal, r.questions.slice(0, 3));
-  } else { closeHelper(); finish(goal); }
+function orderText() {                 // the plain-text order the research engine reads; every answer is a labelled line
+  const v = id => $(id).value.trim(), reach = (document.querySelector("input[name=reach]:checked") || {}).value || "local";
+  const pc = v("pc").toUpperCase().replace(/[^A-Z0-9]/g, "");
+  const where = [v("place"), pc ? "postcode area " + pc : ""].filter(Boolean).join(", ");
+  const L = ["Goal: " + v("goal")];
+  if (v("who")) L.push("Who we are: " + v("who"));
+  if (where) L.push("Where we are: " + where);
+  L.push("How far to look: " + (reach === "uk" ? "anywhere in the UK, national schemes as well as local ones" : "near us: our own area and county first (roughly within 25 miles), then the wider region"));
+  if (v("tried")) L.push("Already tried or leave out: " + v("tried"));
+  return L.join("\n");
+}
+$("n1").addEventListener("click", async () => {
+  if (!checkStep1()) { $("goal").focus(); return; }
+  const g = $("goal").value.trim();
+  saveDraft();
+  if (!CLARIFY_URL || wordCount(g) >= HELPER_MIN_WORDS || g === checkedGoal) { goTo(2); return; }
+  $("n1").setAttribute("disabled", ""); $("n1").textContent = "Reading your goal\u2026";
+  const r = await ask({ goal: g });
+  checkedGoal = g;
+  $("n1").removeAttribute("disabled"); $("n1").textContent = "Continue";
+  if (r && r.enough === false && Array.isArray(r.questions) && r.questions.length) { openHelper(); showQuestions(g, r.questions.slice(0, 3)); }
+  else { goTo(2); }
 });
+$("b2").addEventListener("click", () => goTo(1));
+$("n2").addEventListener("click", () => { if (checkStep2()) { saveDraft(); goTo(3); } });
+$("b3").addEventListener("click", () => goTo(2));
+GO.addEventListener("click", () => {
+  if (!checkStep3()) { $("email").focus(); return; }
+  saveDraft();
+  finish(orderText());
+});
+
+loadDraft();           // whatever they typed before is still there; they always start again at step 1
+goTo(1, true);
 </script>
-<script>window.goatcounter = {path: function(p) { return "/prospect333" + p }}</script>
 <script data-goatcounter="https://signal333.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body>
 </html>

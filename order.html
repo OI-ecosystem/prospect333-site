@@ -1,0 +1,272 @@
+<!doctype html>
+<!-- order.html v3.2 | 17 Nov 2026 | Prospect333 buyer order and report page. Pairs with api/p333.js v3.2. -->
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta name="referrer" content="no-referrer">
+<title>Your Prospect333 report</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f6f5f2;--card:#fff;--ink:#17202a;--mute:#5d6875;--line:#e3e0d9;--accent:#1f4d3a;--accent-ink:#fff;--soft:#e6efe9;--ok:#1b6b45;--ok-bg:#e3f2ea;--warn:#8a5a00;--warn-bg:#fbf0d9;--dark:#14231c;--shadow:0 1px 2px rgba(20,30,25,.06),0 10px 30px rgba(20,30,25,.06)}
+@media (prefers-color-scheme:dark){:root{--bg:#0f1512;--card:#171e1b;--ink:#e8ece9;--mute:#9aa7a0;--line:#26302b;--accent:#7fc4a0;--accent-ink:#0b1410;--soft:#1c2b24;--ok:#7fd1a2;--ok-bg:#16301f;--warn:#e6b95a;--warn-bg:#33280f;--dark:#0a110e;--shadow:none}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+h1,h2{font-family:Fraunces,Georgia,serif;letter-spacing:-.015em;line-height:1.15;margin:0}
+a{color:var(--accent)}
+.wrap{max-width:760px;margin:0 auto;padding:0 20px}
+header{padding:22px 0}
+header a{font:600 20px Fraunces,Georgia,serif;color:var(--ink);text-decoration:none}
+header b{color:var(--accent)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:26px 24px;margin:8px 0 24px}
+.mut{color:var(--mute)}.sm{font-size:14px}
+.eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--accent);margin:0 0 8px}
+ol.steps{list-style:none;margin:22px 0 0;padding:0}
+ol.steps li{display:flex;gap:12px;align-items:flex-start;padding:9px 0;color:var(--mute)}
+ol.steps .dot{flex:0 0 26px;height:26px;border-radius:50%;border:2px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700}
+ol.steps li.done{color:var(--ink)}ol.steps li.done .dot{background:var(--ok-bg);border-color:var(--ok);color:var(--ok)}
+ol.steps li.now{color:var(--ink);font-weight:600}ol.steps li.now .dot{border-color:var(--accent);background:var(--soft);color:var(--accent)}
+.bar{height:8px;border-radius:99px;background:var(--line);overflow:hidden;margin-top:18px}
+.bar i{display:block;height:100%;background:var(--accent);width:0;transition:width .6s ease}
+.btn{display:inline-block;font:600 15px Inter,sans-serif;padding:11px 18px;min-height:44px;border-radius:10px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);cursor:pointer;text-decoration:none}
+.btn.o{background:var(--card);color:var(--ink);border-color:var(--line)}
+.btn:focus-visible,textarea:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+textarea{width:100%;min-height:140px;font:16px/1.5 Inter,sans-serif;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);margin:10px 0 14px}
+.note{background:var(--warn-bg);color:var(--warn);border-radius:10px;padding:12px 14px;font-size:15px}
+.okbox{background:var(--ok-bg);color:var(--ok);border-radius:10px;padding:12px 14px;font-size:15px}
+.hide{display:none!important}
+.frame{width:100%;height:78vh;min-height:520px;border:1px solid var(--line);border-radius:12px;background:#fff}
+.actions{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 14px}
+footer{padding:8px 0 40px;font-size:14px;color:var(--mute)}
+.reportwrap{max-width:1100px}
+</style>
+</head>
+<body>
+<header class="wrap" id="hd"><a href="/">Prospect<b>333</b></a></header>
+
+<main class="wrap" id="mn">
+<noscript><div class="card"><p>This page needs JavaScript to show your order. Please enable it, or email us and we will help.</p></div></noscript>
+
+<section class="card" id="v-load" aria-live="polite"><p class="eyebrow">Your order</p><h1 style="font-size:30px">Checking your order&hellip;</h1><p class="mut">This takes a moment.</p></section>
+
+<section class="card hide" id="v-goal">
+<p class="eyebrow">One more step</p>
+<h1 style="font-size:30px">Tell us your goal</h1>
+<p class="mut">Your payment is confirmed. We could not find your goal in this browser, probably because you paid on a different device. Please write it again and we will start straight away.</p>
+<label for="goal" class="sm mut">Your goal</label>
+<textarea id="goal" maxlength="6000" placeholder="Who you are, what you want to achieve, and where."></textarea>
+<button class="btn" id="goalGo" type="button">Start my report</button>
+<p class="note hide" id="goalErr" role="alert" style="margin-top:14px"></p>
+</section>
+
+<section class="card hide" id="v-recover">
+<p class="eyebrow">Welcome back</p>
+<h1 style="font-size:30px">Open your report</h1>
+<p class="mut">This order was opened on another device or in another browser. For your privacy the report is never handed out from the payment link alone, so we will email a one-time link to the address that paid.</p>
+<button class="btn" id="recGo" type="button">Email me a link</button>
+<p class="note hide" id="recErr" role="alert" style="margin-top:14px"></p>
+<p class="okbox hide" id="recOk" role="status" style="margin-top:14px">If that order exists, a link is on its way to the email address used at checkout. It works once, and opening it signs out any other device. Check your spam folder if it does not arrive within a few minutes.</p>
+<p class="sm mut" style="margin-top:14px">Still stuck? Email <a id="mail3" href="#">us</a> and we will sort it out.</p>
+</section>
+
+<section class="card hide" id="v-run" aria-live="polite">
+<p class="eyebrow">Your report is being prepared</p>
+<h1 style="font-size:30px" id="runTitle">Payment confirmed</h1>
+<p class="mut" id="runMsg">Your research is queued and will start shortly.</p>
+<div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="6" aria-valuenow="0" id="pb"><i id="pbi"></i></div>
+<ol class="steps" id="steps"></ol>
+<p class="sm mut" id="detail" style="margin:6px 0 0"></p>
+<p class="sm mut" style="margin:18px 0 0">This usually takes around ten to fifteen minutes, and you can close this page. Come back to the same link from your receipt email at any time and your report will be here.</p>
+</section>
+
+<section class="card hide" id="v-held" aria-live="polite">
+<p class="eyebrow">Being checked</p>
+<h1 style="font-size:30px">Your report is taking a little longer</h1>
+<p class="mut" id="heldMsg"></p>
+<p class="sm mut">If you have any questions, email <a id="mail1" href="#">us</a> and quote your order number: <b id="ordno"></b>.</p>
+</section>
+
+<section class="card hide" id="v-msg" aria-live="polite"><p class="eyebrow" id="msgEye">Order</p><h1 style="font-size:30px" id="msgT"></h1><p class="mut" id="msgB"></p><p class="sm mut">Email <a id="mail2" href="#">us</a> with your order number and we will sort it out.</p></section>
+</main>
+
+<section class="wrap reportwrap hide" id="v-done">
+<div class="okbox" style="margin-bottom:14px"><b>Your report is ready.</b> Keep your receipt email: its button brings you back to this page whenever you need it.</div>
+<div class="actions">
+<button class="btn" id="openFull" type="button">Open full page</button>
+<button class="btn o" id="printIt" type="button">Print or save as PDF</button>
+</div>
+<iframe class="frame" id="rep" title="Your Prospect333 report" sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox"></iframe>
+</section>
+
+<footer class="wrap"><p>Prospect333 finds published routes and checks them. It cannot promise that any organisation will respond. <a href="terms.html">Terms</a> &middot; <a href="privacy.html">Privacy</a></p></footer>
+
+<script>
+/* ---- EDIT HERE ---- */
+const API = "https://rcloop-proxy.vercel.app/api/p333";
+const CONTACT_EMAIL = "pay1709@sky.com";
+const STAGES = ["Understanding your goal","Searching and reading pages","Judging what was found","Checking each route on its own page","Writing your report","Final quality check"];
+/* ------------------- */
+const $ = id => document.getElementById(id);
+const q = new URLSearchParams(location.search);
+// The Stripe Checkout Session id proves a payment was made. It is NOT the key to the report:
+// the server mints a separate access token, which is what this page stores and uses from then on.
+const SESSION = (q.get("session") || "").trim();
+const RECOVER = (q.get("recover") || "").trim();     // a one-time link from our email: exchanged for a token, then dropped from the address bar
+const STORE = "p333_access:" + SESSION;
+let ACCESS = null;                       // { id, token } once the server has issued one
+let reportHtml = "", timer = null, terminal = false;
+
+function loadAccess(){ try { const s = localStorage.getItem(STORE); return s ? JSON.parse(s) : null; } catch(_) { return null; } }
+function saveAccess(a){ ACCESS = a; try { localStorage.setItem(STORE, JSON.stringify(a)); } catch(_) {} $("ordno").textContent = a.id; }
+
+function show(id){ ["v-load","v-goal","v-recover","v-run","v-held","v-msg"].forEach(v => $(v).classList.toggle("hide", v !== id)); $("v-done").classList.add("hide"); $("mn").classList.remove("hide"); }
+function mailto(subject){ return "mailto:" + CONTACT_EMAIL + "?subject=" + encodeURIComponent(subject + (ACCESS ? " (order " + ACCESS.id + ")" : "")); }
+function setMail(){ $("mail1").href = mailto("Prospect333 report"); $("mail2").href = mailto("Prospect333 order"); $("mail3").href = mailto("Prospect333 report link"); }
+setMail();
+function message(eye, title, body){ $("msgEye").textContent = eye; $("msgT").textContent = title; $("msgB").textContent = body; show("v-msg"); }
+
+async function api(op, body){
+  const r = await fetch(API + "?op=" + op, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+  let j = null; try { j = await r.json(); } catch(_) {}
+  return { code: r.status, body: j || {} };
+}
+
+function drawSteps(stage){
+  $("steps").innerHTML = STAGES.map((s, i) => {
+    const n = i + 1, cls = n < stage ? "done" : (n === stage ? "now" : "");
+    return '<li class="' + cls + '"' + (n === stage ? ' aria-current="step"' : '') + '><span class="dot" aria-hidden="true">' + (n < stage ? "&#10003;" : n) + '</span><span>' + s + (n < stage ? ' <span class="sm mut">(done)</span>' : '') + '</span></li>';
+  }).join("");
+  $("pbi").style.width = Math.round(Math.max(0, stage - 1) / 6 * 100 + (stage ? 4 : 0)) + "%";
+  $("pb").setAttribute("aria-valuenow", String(Math.max(0, stage - 1)));
+}
+
+function apply(s){
+  if (s.state === "done") { terminal = true; stopPoll(); loadReport(); return; }
+  if (s.state === "held") { terminal = true; stopPoll(); $("heldMsg").textContent = s.message || "Your report is being checked by hand before release. Keep this page: it will show your report when it is released."; show("v-held"); return; }
+  if (s.state === "refunded") { terminal = true; stopPoll(); message("Order", "This order was refunded", "No further action is needed."); return; }
+  if (s.state === "awaiting_goal") { stopPoll(); show("v-goal"); return; }   // paid, but we never received the goal
+  show("v-run");
+  const stage = s.stage || 0;
+  $("runTitle").textContent = stage ? "Working on it" : "Payment confirmed";
+  $("runMsg").textContent = stage ? "Step " + stage + " of 6: " + (s.label || STAGES[stage - 1]) : (s.message || "Your research is queued and will start shortly.");
+  $("detail").textContent = s.detail || "";
+  drawSteps(stage);
+  if (!timer) timer = setInterval(poll, 8000);
+}
+function stopPoll(){ if (timer) { clearInterval(timer); timer = null; } }
+
+async function poll(){
+  if (!ACCESS) return;
+  try {
+    const r = await api("status", ACCESS);
+    if (r.code === 200) { apply(r.body); return; }
+    if (r.code === 403 || r.code === 404) {           // the token was replaced elsewhere or withdrawn: offer a fresh link by email
+      stopPoll(); try { localStorage.removeItem(STORE); } catch(_) {} ACCESS = null;
+      $("recErr").textContent = "This device was signed out, because the report was opened somewhere else.";
+      $("recErr").classList.remove("hide"); show("v-recover");
+    }
+  } catch(_) { /* a missed poll is fine: the next one tries again */ }
+}
+
+async function loadReport(){
+  try {
+    const r = await api("report", ACCESS);
+    if (r.code !== 200 || !r.body.html) { message("Order", "We could not load your report just now", "Please refresh this page in a minute. If it still does not appear, email us."); return; }
+    reportHtml = r.body.html;
+    $("rep").srcdoc = reportHtml;
+    $("mn").classList.add("hide"); $("v-done").classList.remove("hide");
+    try { localStorage.removeItem("p333_goal"); localStorage.removeItem("p333_draft"); } catch(_) {}
+  } catch(_) { message("Order", "We could not load your report just now", "Please refresh this page in a minute."); }
+}
+$("openFull").addEventListener("click", () => {
+  if (!reportHtml) return;
+  const u = URL.createObjectURL(new Blob([reportHtml], { type: "text/html" }));
+  window.open(u, "_blank", "noopener");
+});
+$("printIt").addEventListener("click", () => {
+  if (!reportHtml) return;
+  const u = URL.createObjectURL(new Blob([reportHtml], { type: "text/html" }));
+  const w = window.open(u, "_blank");
+  if (w) w.addEventListener("load", () => { try { w.print(); } catch(_) {} });
+});
+
+function trouble(r){
+  if (r.code === 402) { message("Order", "We could not confirm this payment", "Please use the link Stripe sent you, or the button on your receipt. If you have paid and this keeps happening, email us and we will sort it out."); return true; }
+  if (r.code === 503) { message("Order", "We are not taking reports just yet", "Your order is recorded and your payment is safe. Email us and we will start it as soon as we open."); return true; }
+  if (r.code === 429) { message("Order", "Too many tries", "Please wait a few minutes and refresh this page."); return true; }
+  if (r.code >= 500) { message("Order", "Something went wrong on our side", "Your payment is safe. Please refresh this page in a minute, or email us."); return true; }
+  return false;
+}
+
+async function begin(goal){
+  show("v-load");
+  let r;
+  try { r = await api("start", { session: SESSION, goal: goal }); }
+  catch(_) { message("Order", "We could not reach the server", "Your payment is safe. Please refresh this page in a minute."); return; }
+  if (r.code === 200 && r.body.token) {
+    saveAccess({ id: r.body.id, token: r.body.token }); setMail();
+    try { localStorage.removeItem("p333_goal"); localStorage.removeItem("p333_draft"); } catch(_) {}
+    apply(r.body); return;
+  }
+  if (r.code === 409 && r.body.error === "goal") {
+    show("v-goal");
+    if (goal) { $("goalErr").textContent = "Please write a little more: a sentence or two about who you are and what you want."; $("goalErr").classList.remove("hide"); }
+    return;
+  }
+  if (r.code === 409 && r.body.error === "already_started") { show("v-recover"); return; }   // started on another device: prove the checkout email
+  if (trouble(r)) return;
+  message("Order", "Something went wrong on our side", "Your payment is safe. Please refresh this page in a minute, or email us.");
+}
+
+// Ask us to email a one-time link to whoever paid. We never say whether the order exists, so this cannot be used to probe for customers.
+async function askForLink(){
+  $("recErr").classList.add("hide");
+  $("recGo").setAttribute("disabled", ""); $("recGo").textContent = "Sending…";
+  let r;
+  try { r = await api("recover_start", { session: SESSION }); }
+  catch(_) { r = { code: 0, body: {} }; }
+  $("recGo").removeAttribute("disabled"); $("recGo").textContent = "Email me a link";
+  if (r.code === 429) { $("recErr").textContent = "Too many requests. Please wait a few minutes and try again."; $("recErr").classList.remove("hide"); return; }
+  $("recOk").classList.remove("hide");
+}
+
+// Exchange the one-time link from the email for an access token on THIS device, then take it out of the address bar.
+async function claimLink(nonce){
+  show("v-load");
+  let r;
+  try { r = await api("recover_claim", { session: SESSION, nonce: nonce }); }
+  catch(_) { message("Order", "We could not reach the server", "Your payment is safe. Please refresh this page in a minute."); return; }
+  try { history.replaceState(null, "", location.pathname + "?session=" + encodeURIComponent(SESSION)); } catch(_) {}
+  if (r.code === 200 && r.body.token) { saveAccess({ id: r.body.id, token: r.body.token }); setMail(); apply(r.body); return; }
+  if (r.code === 403 || r.code === 404) {
+    $("recErr").textContent = "That link has already been used, or it has expired. Ask for a fresh one below.";
+    $("recErr").classList.remove("hide"); show("v-recover"); return;
+  }
+  if (trouble(r)) return;
+  show("v-recover");
+}
+
+$("goalGo").addEventListener("click", () => { $("goalErr").classList.add("hide"); begin($("goal").value.trim()); });
+$("recGo").addEventListener("click", askForLink);
+
+(function init(){
+  if (!/^cs_(test|live)_[A-Za-z0-9]{10,200}$/.test(SESSION)) {
+    message("Order", "This link is not complete", "Please open the link Stripe sent you after payment, or the link in your Prospect333 email.");
+    return;
+  }
+  setMail();
+  if (/^[A-Za-z0-9_-]{43}$/.test(RECOVER)) { claimLink(RECOVER); return; }   // came from our email: that link wins over anything stored here
+  const a = loadAccess();
+  if (a && a.id && a.token) {
+    ACCESS = a; $("ordno").textContent = a.id; setMail(); show("v-load");
+    poll().then(() => { if (!timer && !terminal) { timer = setInterval(poll, 8000); } });     // keep trying if that first check could not reach us
+    return;
+  }
+  let g = ""; try { g = localStorage.getItem("p333_goal") || ""; } catch(_) {}
+  begin(g);
+})();
+</script>
+</body>
+</html>
